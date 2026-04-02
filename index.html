@@ -37,84 +37,143 @@
 
     body.show { opacity:1; transform:translateY(0); }
 
-    header, footer {
+    header {
       position: fixed;
-      width:100%;
-      text-align:center;
-      padding:15px;
-      backdrop-filter:blur(12px);
+      top: 0;
+      width: 100%;
+      padding: 15px 30px;
+      backdrop-filter: blur(12px);
+      background: rgba(0, 0, 0, 0.3);
+      color: var(--text);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end; /* push nav right */
+      gap: 30px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    header .title {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 20px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    header .nav-links a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: normal;
+      font-size: 16px;
+      transition: color 0.3s;
+      cursor: pointer;
+      margin-left: 25px; /* Added spacing between links */
+    }
+
+    header .nav-links a:hover {
+      color: #FFD700;
+      text-shadow: 0 0 6px rgba(255, 215, 0, 0.8);
+    }
+
+    footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      text-align: center;
+      padding: 15px;
+      backdrop-filter: blur(12px);
       background: rgba(0,0,0,0.3);
-      color:var(--text);
-      z-index:1000;
+      color: var(--text);
+      font-size: 14px;
+      z-index: 1000;
     }
 
-    header { top:0; font-size:clamp(18px,3vw,26px); font-weight:bold; }
-    footer { bottom:0; font-size:14px; }
-
-    .toggle {
-      position:absolute;
-      top:15px;
-      right:20px;
-      cursor:pointer;
-      padding:8px 12px;
-      border-radius:10px;
-      background: rgba(255,255,255,0.1);
-      transition:0.3s;
+    h1 {
+      font-size: clamp(36px, 6vw, 60px);
+      margin-bottom: 30px;
+      text-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
     }
 
-    .toggle:hover { background: rgba(255,255,255,0.25); }
-
-    h1 { font-size:clamp(36px,6vw,60px); margin-bottom:30px; text-shadow:0 0 15px rgba(0,0,0,0.5); }
-
-    .btn-container { display:flex; flex-wrap:wrap; justify-content:center; gap:20px; }
+    .btn-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
 
     .btn {
-      position:relative;
-      padding:18px 35px;
-      font-size:18px;
-      font-weight:bold;
-      border-radius:15px;
-      border:none;
-      cursor:pointer;
-      color:white;
-      background: rgba(255,255,255,0.1);
+      position: relative;
+      padding: 18px 35px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 15px;
+      border: none;
+      cursor: pointer;
+      color: white;
+      background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(10px);
-      overflow:hidden;
-      transition:0.4s;
-      box-shadow:0 0 15px rgba(0,0,0,0.2);
+      overflow: hidden;
+      transition: 0.4s;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
     }
 
     .btn::before {
-      content:"";
-      position:absolute;
-      top:-50%;
-      left:-50%;
-      width:200%;
-      height:200%;
-      background:radial-gradient(circle,rgba(255,255,255,0.3),transparent 70%);
-      transform:rotate(45deg);
-      transition:0.5s;
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.3), transparent 70%);
+      transform: rotate(45deg);
+      transition: 0.5s;
     }
 
-    .btn:hover::before { top:0; left:0; }
-    .btn:hover { transform:scale(1.08); box-shadow:0 0 25px rgba(255,255,255,0.4); }
+    .btn:hover::before {
+      top: 0;
+      left: 0;
+    }
 
-    .levi { background:#5865F2; }
-    .discord { background:#2ecc71; }
+    .btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.4);
+    }
 
-    canvas { position:fixed; top:0; left:0; z-index:0; }
+    .levi {
+      background: #5865F2;
+    }
+
+    .discord {
+      background: #2ecc71;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
   </style>
 </head>
 
 <body>
 
 <header>
-  🎮 Gaming Community Server
+  <div class="title">🎮 Gaming Community Server</div>
+  <nav class="nav-links">
+    <a href="games.html">Games</a>
+    <a href="events.html">Events</a>
+    <a href="staff.html">Staff</a>
+    <a href="rules.html">Rules</a>
+  </nav>
 </header>
 
 <canvas id="canvas"></canvas>
 
-<h1>Welcome to the Gaming Community !</h1>
+<h1>Welcome to the Gaming Community!</h1>
 
 <div class="btn-container">
   <button class="btn levi" onclick="goPage('form.html')">Levi Hunt</button>
@@ -123,7 +182,6 @@
   <a href="https://discord.gg/exH5gwGP3U" target="_blank">
     <button class="btn discord">Discord</button>
   </a>
-
 </div>
 
 <footer>
@@ -131,32 +189,39 @@
 </footer>
 
 <script>
-  if(localStorage.getItem("theme")==="light"){ document.body.classList.add("light"); }
+  if(localStorage.getItem("theme")==="light"){
+    document.body.classList.add("light");
+  }
+
   function toggleTheme(){
     document.body.classList.toggle("light");
     localStorage.setItem("theme", document.body.classList.contains("light")?"light":"dark");
   }
 
-  window.onload = ()=>{ document.body.classList.add("show"); }
+  window.onload = () => {
+    document.body.classList.add("show");
+  }
 
   function goPage(page){
     document.body.classList.remove("show");
-    setTimeout(()=>{ window.location.href = page; },400);
+    setTimeout(()=>{
+      window.location.href = page;
+    }, 400);
   }
 
-  const canvas=document.getElementById("canvas");
-  const ctx=canvas.getContext("2d");
-  canvas.width=window.innerWidth;
-  canvas.height=window.innerHeight;
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 
-  const particles=[];
-  for(let i=0;i<100;i++){
+  const particles = [];
+  for(let i = 0; i < 100; i++){
     particles.push({
-      x:Math.random()*canvas.width,
-      y:Math.random()*canvas.height,
-      r:Math.random()*2+1,
-      dx:(Math.random()-0.5)*0.5,
-      dy:(Math.random()-0.5)*0.5
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 2 + 1,
+      dx: (Math.random() - 0.5) * 0.5,
+      dy: (Math.random() - 0.5) * 0.5
     });
   }
 
@@ -164,18 +229,22 @@
     ctx.clearRect(0,0,canvas.width,canvas.height);
     particles.forEach(p=>{
       ctx.beginPath();
-      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle="rgba(255,255,255,0.5)";
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,255,255,0.5)";
       ctx.fill();
-      p.x+=p.dx; p.y+=p.dy;
-      if(p.x<0||p.x>canvas.width)p.dx*=-1;
-      if(p.y<0||p.y>canvas.height)p.dy*=-1;
+      p.x += p.dx;
+      p.y += p.dy;
+      if(p.x < 0 || p.x > canvas.width) p.dx *= -1;
+      if(p.y < 0 || p.y > canvas.height) p.dy *= -1;
     });
     requestAnimationFrame(animate);
   }
   animate();
 
-  window.addEventListener('resize',()=>{ canvas.width=window.innerWidth; canvas.height=window.innerHeight; });
+  window.addEventListener('resize', ()=>{
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
 </script>
 
 </body>
