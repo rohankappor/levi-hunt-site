@@ -1,4 +1,3 @@
-<!-- cd profff -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -146,13 +145,17 @@
   <input id="username" placeholder="Roblox Username">
   <input id="level" type="number" placeholder="Your Level">
 
-  <select id="location">
-    <option value="">Choose Levi Location</option>
-    <option value="Tiki">🌴 Tiki</option>
-    <option value="Hydra">🐍 Hydra</option>
-  </select>
+  <!-- NEW DISCORD FIELD -->
+  <input id="discord" placeholder="Your Discord ID (e.g. user#1234)">
+<select id="location">
+  <option value="">Choose Levi Location</option>
+  <option value="Tiki">🌴 Tiki</option>
+  <option value="Hydra">🐍 Hydra</option>
+</select>
 
-  <input type="file" id="file">
+<p style="margin-top:10px; font-weight:bold;">Send CD Proof Here 📸</p>
+
+<input type="file" id="file">
 
   <button onclick="submitData()">Submit</button>
   <button onclick="goBack()">⬅ Back</button>
@@ -165,123 +168,124 @@
 </footer>
 
 <script>
-  // Dark/light theme
-  if(localStorage.getItem("theme")==="light"){ document.body.classList.add("light"); }
-  function toggleTheme(){
-    document.body.classList.toggle("light");
-    localStorage.setItem("theme",document.body.classList.contains("light")?"light":"dark");
-  }
+if(localStorage.getItem("theme")==="light"){
+  document.body.classList.add("light");
+}
 
-  // Page fade-in
-  window.onload = () => { document.body.classList.add("show"); }
+function toggleTheme(){
+  document.body.classList.toggle("light");
+  localStorage.setItem("theme",document.body.classList.contains("light")?"light":"dark");
+}
 
-  // Back button
-  function goBack(){
-    document.body.classList.remove("show");
-    setTimeout(()=>{ window.location.href="index.html"; },400);
-  }
+window.onload = () => { document.body.classList.add("show"); }
 
-  // Roblox avatar preview
-  const usernameInput = document.getElementById("username");
-  const avatarImg = document.getElementById("avatar");
+function goBack(){
+  document.body.classList.remove("show");
+  setTimeout(()=>{ window.location.href="index.html"; },400);
+}
 
-  usernameInput.addEventListener("change",()=>{
-    const user = usernameInput.value.trim();
-    if(user){
-      avatarImg.src = `https://www.roblox.com/bust-thumbnail/image?username=${user}&width=150&height=150&format=png`;
-      avatarImg.style.display = "block";
-    } else avatarImg.style.display="none";
+const usernameInput = document.getElementById("username");
+const avatarImg = document.getElementById("avatar");
+
+usernameInput.addEventListener("change",()=>{
+  const user = usernameInput.value.trim();
+  if(user){
+    avatarImg.src = `https://www.roblox.com/bust-thumbnail/image?username=${user}&width=150&height=150&format=png`;
+    avatarImg.style.display = "block";
+  } else avatarImg.style.display="none";
+});
+
+// particles
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const particles=[];
+for(let i=0;i<120;i++){
+  particles.push({
+    x:Math.random()*canvas.width,
+    y:Math.random()*canvas.height,
+    r:Math.random()*2+1,
+    dx:(Math.random()-0.5)*0.5,
+    dy:(Math.random()-0.5)*0.5
   });
+}
 
-  // Particle background
-  const canvas = document.getElementById("canvas");
-  const ctx = canvas.getContext("2d");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle="rgba(255,255,255,0.5)";
+    ctx.fill();
+    p.x+=p.dx; p.y+=p.dy;
+    if(p.x<0||p.x>canvas.width)p.dx*=-1;
+    if(p.y<0||p.y>canvas.height)p.dy*=-1;
+  });
+  requestAnimationFrame(animate);
+}
+animate();
 
-  const particles=[];
-  for(let i=0;i<120;i++){
-    particles.push({
-      x:Math.random()*canvas.width,
-      y:Math.random()*canvas.height,
-      r:Math.random()*2+1,
-      dx:(Math.random()-0.5)*0.5,
-      dy:(Math.random()-0.5)*0.5
+window.addEventListener('resize',()=>{
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+});
+
+async function submitData(){
+  const user = usernameInput.value.trim();
+  const lvl = document.getElementById("level").value;
+  const discord = document.getElementById("discord").value.trim();
+  const loc = document.getElementById("location").value;
+  const fileInput = document.getElementById("file");
+  const file = fileInput.files[0];
+
+  if(!user || !lvl || !loc || !file || !discord){
+    document.getElementById("status").innerText="Please fill all fields!";
+    return;
+  }
+
+  document.getElementById("status").innerText="Submitting...";
+
+  const webhookURL = "YOUR_WEBHOOK_HERE";
+
+  const payload = {
+    username: "Levi Hunt Bot",
+    avatar_url: avatarImg.src || "",
+    embeds: [{
+      title: "New Levi Hunt Submission!",
+      color: 0x5865F2,
+      fields:[
+        {name:"Username", value:user, inline:true},
+        {name:"Level", value:lvl, inline:true},
+        {name:"Discord ID", value:discord, inline:true},
+        {name:"Location", value:loc, inline:true}
+      ]
+    }]
+  };
+
+  const form = new FormData();
+  form.append("payload_json", JSON.stringify(payload));
+  form.append("file", file, file.name);
+
+  try{
+    await fetch(webhookURL,{
+      method:"POST",
+      body:form
     });
+
+    document.getElementById("status").innerText="Submitted successfully!";
+    fileInput.value="";
+    usernameInput.value="";
+    document.getElementById("level").value="";
+    document.getElementById("discord").value="";
+    document.getElementById("location").value="";
+    avatarImg.style.display="none";
+
+  } catch(err){
+    document.getElementById("status").innerText="Submission failed.";
   }
-
-  function animate(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    particles.forEach(p=>{
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle="rgba(255,255,255,0.5)";
-      ctx.fill();
-      p.x+=p.dx; p.y+=p.dy;
-      if(p.x<0||p.x>canvas.width)p.dx*=-1;
-      if(p.y<0||p.y>canvas.height)p.dy*=-1;
-    });
-    requestAnimationFrame(animate);
-  }
-  animate();
-  window.addEventListener('resize',()=>{ canvas.width=window.innerWidth; canvas.height=window.innerHeight; });
-
-  // Discord webhook submission
-  async function submitData(){
-    const user=usernameInput.value.trim();
-    const lvl=document.getElementById("level").value;
-    const loc=document.getElementById("location").value;
-    const fileInput=document.getElementById("file");
-    const file=fileInput.files[0];
-
-    if(!user || !lvl || !loc || !file){
-      document.getElementById("status").innerText="Please fill all fields and upload a file!";
-      return;
-    }
-
-    document.getElementById("status").innerText="Submitting...";
-
-    // Convert file to base64
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64Data = reader.result.split(',')[1];
-
-      const webhookURL = "https://discord.com/api/webhooks/1489190744483823709/Ec6U3EjtIhZmP84Vjs4d2VU0p4AKa76Xdbxvk4Y2zu5mfUmE3OGdbf_-RNPKx_s-qULZ";
-
-      const payload = {
-        username: "Levi Hunt Bot",
-        avatar_url: avatarImg.src || "",
-        embeds: [{
-          title: "New Levi Hunt Submission!",
-          color: 0x5865F2,
-          fields:[
-            {name:"Username", value:user, inline:true},
-            {name:"Level", value:lvl, inline:true},
-            {name:"Location", value:loc, inline:true}
-          ],
-          image: {url:`attachment://${file.name}`}
-        }]
-      };
-
-      const form = new FormData();
-      form.append("payload_json", JSON.stringify(payload));
-      form.append("file", file, file.name);
-
-      try{
-        await fetch(webhookURL,{
-          method:"POST",
-          body:form
-        });
-        document.getElementById("status").innerText="Submitted successfully!";
-        fileInput.value=""; usernameInput.value=""; document.getElementById("level").value=""; document.getElementById("location").value="";
-        avatarImg.style.display="none";
-      } catch(err){
-        console.error(err);
-        document.getElementById("status").innerText="Submission failed. Try again.";
-      }
-    };
-    reader.readAsDataURL(file);
-  }
+}
 </script>
 
 </body>
