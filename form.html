@@ -1,0 +1,288 @@
+<!-- cd profff -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Leviathan Hunt - Blox Fruits</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+    :root {
+      --bg-start: #0f2027;
+      --bg-end: #203a43;
+      --text: white;
+    }
+
+    body.light {
+      --bg-start: #e0eafc;
+      --bg-end: #cfdef3;
+      --text: #111;
+    }
+
+    * { box-sizing: border-box; margin:0; padding:0; font-family:'Roboto',sans-serif; }
+
+    body {
+      min-height: 100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(135deg,var(--bg-start),var(--bg-end));
+      color:var(--text);
+      overflow:hidden;
+      transition:0.5s;
+      opacity:0;
+      transform:translateY(20px);
+    }
+
+    body.show { opacity:1; transform:translateY(0); transition:0.5s; }
+
+    header, footer {
+      position: fixed;
+      width: 100%;
+      text-align:center;
+      padding:15px;
+      backdrop-filter: blur(12px);
+      background: rgba(0,0,0,0.3);
+      color: var(--text);
+      z-index:1000;
+    }
+
+    header { top:0; font-size: clamp(18px,3vw,26px); font-weight:bold; }
+    footer { bottom:0; font-size:14px; }
+
+    .toggle {
+      position:absolute;
+      top:15px;
+      right:20px;
+      cursor:pointer;
+      padding:8px 12px;
+      border-radius:10px;
+      background: rgba(255,255,255,0.1);
+      transition:0.3s;
+    }
+
+    .toggle:hover { background: rgba(255,255,255,0.25); }
+
+    .box {
+      width:90%;
+      max-width:450px;
+      background: rgba(255,255,255,0.1);
+      padding:30px;
+      border-radius:20px;
+      backdrop-filter: blur(12px);
+      text-align:center;
+      box-shadow:0 0 25px rgba(0,0,0,0.2);
+      z-index:1;
+      position:relative;
+    }
+
+    h2 { margin-bottom:20px; font-size: clamp(24px,4vw,32px); }
+
+    input, select, button {
+      width:100%;
+      padding:14px;
+      margin:10px 0;
+      border-radius:12px;
+      border:none;
+      font-size:16px;
+      outline:none;
+    }
+
+    button {
+      background:#5865F2;
+      color:white;
+      font-weight:bold;
+      cursor:pointer;
+      transition:0.3s;
+      position:relative;
+      overflow:hidden;
+    }
+
+    button::before {
+      content:"";
+      position:absolute;
+      top:-50%;
+      left:-50%;
+      width:200%;
+      height:200%;
+      background:radial-gradient(circle,rgba(255,255,255,0.3),transparent 70%);
+      transform:rotate(45deg);
+      transition:0.5s;
+    }
+
+    button:hover::before { top:0; left:0; }
+    button:hover { transform:scale(1.05); box-shadow:0 0 20px rgba(255,255,255,0.4); }
+    button:active { transform:scale(0.95); }
+
+    #avatar {
+      width:100px;
+      height:100px;
+      border-radius:50%;
+      border:3px solid white;
+      margin:15px auto;
+      display:none;
+    }
+
+    canvas { position: fixed; top:0; left:0; z-index:0; }
+  </style>
+</head>
+
+<body>
+
+<header>
+  🎮 Leviathan Hunt - Blox Fruits
+  <div class="toggle" onclick="toggleTheme()">🌙 / ☀️</div>
+</header>
+
+<canvas id="canvas"></canvas>
+
+<div class="box">
+  <h2>Submit Your Hunt</h2>
+
+  <img id="avatar">
+
+  <input id="username" placeholder="Roblox Username">
+  <input id="level" type="number" placeholder="Your Level">
+
+  <select id="location">
+    <option value="">Choose Levi Location</option>
+    <option value="Tiki">🌴 Tiki</option>
+    <option value="Hydra">🐍 Hydra</option>
+  </select>
+
+  <input type="file" id="file">
+
+  <button onclick="submitData()">Submit</button>
+  <button onclick="goBack()">⬅ Back</button>
+
+  <p id="status"></p>
+</div>
+
+<footer>
+  © 2026 All Rights Reserved by EazGamer
+</footer>
+
+<script>
+  // Dark/light theme
+  if(localStorage.getItem("theme")==="light"){ document.body.classList.add("light"); }
+  function toggleTheme(){
+    document.body.classList.toggle("light");
+    localStorage.setItem("theme",document.body.classList.contains("light")?"light":"dark");
+  }
+
+  // Page fade-in
+  window.onload = () => { document.body.classList.add("show"); }
+
+  // Back button
+  function goBack(){
+    document.body.classList.remove("show");
+    setTimeout(()=>{ window.location.href="index.html"; },400);
+  }
+
+  // Roblox avatar preview
+  const usernameInput = document.getElementById("username");
+  const avatarImg = document.getElementById("avatar");
+
+  usernameInput.addEventListener("change",()=>{
+    const user = usernameInput.value.trim();
+    if(user){
+      avatarImg.src = `https://www.roblox.com/bust-thumbnail/image?username=${user}&width=150&height=150&format=png`;
+      avatarImg.style.display = "block";
+    } else avatarImg.style.display="none";
+  });
+
+  // Particle background
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const particles=[];
+  for(let i=0;i<120;i++){
+    particles.push({
+      x:Math.random()*canvas.width,
+      y:Math.random()*canvas.height,
+      r:Math.random()*2+1,
+      dx:(Math.random()-0.5)*0.5,
+      dy:(Math.random()-0.5)*0.5
+    });
+  }
+
+  function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p=>{
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle="rgba(255,255,255,0.5)";
+      ctx.fill();
+      p.x+=p.dx; p.y+=p.dy;
+      if(p.x<0||p.x>canvas.width)p.dx*=-1;
+      if(p.y<0||p.y>canvas.height)p.dy*=-1;
+    });
+    requestAnimationFrame(animate);
+  }
+  animate();
+  window.addEventListener('resize',()=>{ canvas.width=window.innerWidth; canvas.height=window.innerHeight; });
+
+  // Discord webhook submission
+  async function submitData(){
+    const user=usernameInput.value.trim();
+    const lvl=document.getElementById("level").value;
+    const loc=document.getElementById("location").value;
+    const fileInput=document.getElementById("file");
+    const file=fileInput.files[0];
+
+    if(!user || !lvl || !loc || !file){
+      document.getElementById("status").innerText="Please fill all fields and upload a file!";
+      return;
+    }
+
+    document.getElementById("status").innerText="Submitting...";
+
+    // Convert file to base64
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64Data = reader.result.split(',')[1];
+
+      const webhookURL = "https://discord.com/api/webhooks/1489190744483823709/Ec6U3EjtIhZmP84Vjs4d2VU0p4AKa76Xdbxvk4Y2zu5mfUmE3OGdbf_-RNPKx_s-qULZ";
+
+      const payload = {
+        username: "Levi Hunt Bot",
+        avatar_url: avatarImg.src || "",
+        embeds: [{
+          title: "New Levi Hunt Submission!",
+          color: 0x5865F2,
+          fields:[
+            {name:"Username", value:user, inline:true},
+            {name:"Level", value:lvl, inline:true},
+            {name:"Location", value:loc, inline:true}
+          ],
+          image: {url:`attachment://${file.name}`}
+        }]
+      };
+
+      const form = new FormData();
+      form.append("payload_json", JSON.stringify(payload));
+      form.append("file", file, file.name);
+
+      try{
+        await fetch(webhookURL,{
+          method:"POST",
+          body:form
+        });
+        document.getElementById("status").innerText="Submitted successfully!";
+        fileInput.value=""; usernameInput.value=""; document.getElementById("level").value=""; document.getElementById("location").value="";
+        avatarImg.style.display="none";
+      } catch(err){
+        console.error(err);
+        document.getElementById("status").innerText="Submission failed. Try again.";
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+</script>
+
+</body>
+</html>
