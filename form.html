@@ -35,7 +35,7 @@
       transform:translateY(20px);
     }
 
-    body.show { opacity:1; transform:translateY(0); transition:0.5s; }
+    body.show { opacity:1; transform:translateY(0); }
 
     header, footer {
       position: fixed;
@@ -59,10 +59,41 @@
       padding:8px 12px;
       border-radius:10px;
       background: rgba(255,255,255,0.1);
-      transition:0.3s;
     }
 
     .toggle:hover { background: rgba(255,255,255,0.25); }
+
+    /* NAVBAR */
+    .nav-links {
+      position: fixed;
+      top: 70px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      padding: 10px;
+      backdrop-filter: blur(10px);
+      background: rgba(0,0,0,0.25);
+      z-index: 999;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text);
+      font-weight: bold;
+      padding: 8px 14px;
+      border-radius: 10px;
+      transition: 0.3s;
+    }
+
+    .nav-links a:hover { background: rgba(255,255,255,0.2); }
+
+    /* MOBILE */
+    @media (max-width: 600px) {
+      .nav-links { gap: 10px; padding: 8px; }
+      .nav-links a { font-size: 14px; padding: 6px 10px; }
+    }
 
     .box {
       width:90%;
@@ -75,9 +106,10 @@
       box-shadow:0 0 25px rgba(0,0,0,0.2);
       z-index:1;
       position:relative;
+      margin-top:120px;
     }
 
-    h2 { margin-bottom:20px; font-size: clamp(24px,4vw,32px); }
+    h2 { margin-bottom:20px; }
 
     input, select, button {
       width:100%;
@@ -95,25 +127,9 @@
       font-weight:bold;
       cursor:pointer;
       transition:0.3s;
-      position:relative;
-      overflow:hidden;
     }
 
-    button::before {
-      content:"";
-      position:absolute;
-      top:-50%;
-      left:-50%;
-      width:200%;
-      height:200%;
-      background:radial-gradient(circle,rgba(255,255,255,0.3),transparent 70%);
-      transform:rotate(45deg);
-      transition:0.5s;
-    }
-
-    button:hover::before { top:0; left:0; }
     button:hover { transform:scale(1.05); box-shadow:0 0 20px rgba(255,255,255,0.4); }
-    button:active { transform:scale(0.95); }
 
     #avatar {
       width:100px;
@@ -133,6 +149,13 @@
 <header>
   🎮 Leviathan Hunt - Blox Fruits
   <div class="toggle" onclick="toggleTheme()">🌙 / ☀️</div>
+  <nav class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="games.html">Games</a>
+    <a href="events.html">Events</a>
+    <a href="staff.html">Staff</a>
+    <a href="rules.html">Rules</a>
+  </nav>
 </header>
 
 <canvas id="canvas"></canvas>
@@ -144,18 +167,16 @@
 
   <input id="username" placeholder="Roblox Username">
   <input id="level" type="number" placeholder="Your Level">
-
-  <!-- NEW DISCORD FIELD -->
   <input id="discord" placeholder="Your Discord ID (e.g. user#1234)">
-<select id="location">
-  <option value="">Choose Levi Location</option>
-  <option value="Tiki">🌴 Tiki</option>
-  <option value="Hydra">🐍 Hydra</option>
-</select>
 
-<p style="margin-top:10px; font-weight:bold;">Send CD Proof Here 📸</p>
+  <select id="location">
+    <option value="">Choose Levi Location</option>
+    <option value="Tiki">🌴 Tiki</option>
+    <option value="Hydra">🐍 Hydra</option>
+  </select>
 
-<input type="file" id="file">
+  <p style="margin-top:10px; font-weight:bold;">Send CD Proof Here 📸</p>
+  <input type="file" id="file">
 
   <button onclick="submitData()">Submit</button>
   <button onclick="goBack()">⬅ Back</button>
@@ -163,15 +184,10 @@
   <p id="status"></p>
 </div>
 
-<footer>
-  © 2026 All Rights Reserved by EzGamer
-</footer>
+<footer>© 2026 All Rights Reserved by EzGamer</footer>
 
 <script>
-if(localStorage.getItem("theme")==="light"){
-  document.body.classList.add("light");
-}
-
+if(localStorage.getItem("theme")==="light") document.body.classList.add("light");
 function toggleTheme(){
   document.body.classList.toggle("light");
   localStorage.setItem("theme",document.body.classList.contains("light")?"light":"dark");
@@ -179,59 +195,28 @@ function toggleTheme(){
 
 window.onload = () => { document.body.classList.add("show"); }
 
-function goBack(){
-  document.body.classList.remove("show");
-  setTimeout(()=>{ window.location.href="index.html"; },400);
-}
+function goBack(){ document.body.classList.remove("show"); setTimeout(()=>{ window.location.href="index.html"; },400); }
 
 const usernameInput = document.getElementById("username");
 const avatarImg = document.getElementById("avatar");
 
 usernameInput.addEventListener("change",()=>{
   const user = usernameInput.value.trim();
-  if(user){
-    avatarImg.src = `https://www.roblox.com/bust-thumbnail/image?username=${user}&width=150&height=150&format=png`;
-    avatarImg.style.display = "block";
-  } else avatarImg.style.display="none";
+  if(user){ avatarImg.src = `https://www.roblox.com/bust-thumbnail/image?username=${user}&width=150&height=150&format=png`; avatarImg.style.display = "block"; }
+  else avatarImg.style.display="none";
 });
 
-// particles
+// PARTICLES
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+const particles=[]; for(let i=0;i<120;i++){ particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*2+1,dx:(Math.random()-0.5)*0.5,dy:(Math.random()-0.5)*0.5}); }
 
-const particles=[];
-for(let i=0;i<120;i++){
-  particles.push({
-    x:Math.random()*canvas.width,
-    y:Math.random()*canvas.height,
-    r:Math.random()*2+1,
-    dx:(Math.random()-0.5)*0.5,
-    dy:(Math.random()-0.5)*0.5
-  });
-}
-
-function animate(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  particles.forEach(p=>{
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fillStyle="rgba(255,255,255,0.5)";
-    ctx.fill();
-    p.x+=p.dx; p.y+=p.dy;
-    if(p.x<0||p.x>canvas.width)p.dx*=-1;
-    if(p.y<0||p.y>canvas.height)p.dy*=-1;
-  });
-  requestAnimationFrame(animate);
-}
+function animate(){ ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{ ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle="rgba(255,255,255,0.5)"; ctx.fill(); p.x+=p.dx; p.y+=p.dy; if(p.x<0||p.x>canvas.width)p.dx*=-1; if(p.y<0||p.y>canvas.height)p.dy*=-1; }); requestAnimationFrame(animate); }
 animate();
+window.addEventListener('resize',()=>{ canvas.width=window.innerWidth; canvas.height=window.innerHeight; });
 
-window.addEventListener('resize',()=>{
-  canvas.width=window.innerWidth;
-  canvas.height=window.innerHeight;
-});
-
+// FORM SUBMIT
 async function submitData(){
   const user = usernameInput.value.trim();
   const lvl = document.getElementById("level").value;
@@ -247,7 +232,7 @@ async function submitData(){
 
   document.getElementById("status").innerText="Submitting...";
 
-  const webhookURL = "YOUR_WEBHOOK_HERE";
+  const webhookURL = "https://discord.com/api/webhooks/1489190744483823709/Ec6U3EjtIhZmP84Vjs4d2VU0p4AKa76Xdbxvk4Y2zu5mfUmE3OGdbf_-RNPKx_s-qULZ"; // Replace with your webhook
 
   const payload = {
     username: "Levi Hunt Bot",
@@ -269,19 +254,8 @@ async function submitData(){
   form.append("file", file, file.name);
 
   try{
-    await fetch(webhookURL,{
-      method:"POST",
-      body:form
-    });
-
-    document.getElementById("status").innerText="Submitted successfully!";
-    fileInput.value="";
-    usernameInput.value="";
-    document.getElementById("level").value="";
-    document.getElementById("discord").value="";
-    document.getElementById("location").value="";
-    avatarImg.style.display="none";
-
+    await fetch(webhookURL,{ method:"POST", body:form });
+    window.location.href = "thankyou.html"; // redirect after submit
   } catch(err){
     document.getElementById("status").innerText="Submission failed.";
   }
